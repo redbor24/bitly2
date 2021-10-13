@@ -20,11 +20,16 @@ def shorten_link(token, url):
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
     }
+
+    if not parse.urlparse(url).scheme:
+        fu = parse.urlparse(link)._replace(scheme='http://')
+        url = f'{fu.scheme}{fu.netloc}{fu.path}{fu.params}{fu.query}{fu.fragment}'
+
     json_str = json.dumps({"long_url": url, "domain": "bit.ly"})
     response = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=headers, data=json_str)
     try:
         response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except requests.exceptions.HTTPError:
         if response.json()['message'] == 'INVALID_ARG_LONG_URL':
             raise Exception(f'некорректный URL - {url}')
     return response.json()['link']
@@ -86,9 +91,6 @@ def is_bitlink(token, link):
 if __name__ == '__main__':
     my_token = config('token', '')
     link = input('Введите ссылку:')
-    # link = 'http://redbor.ru'  # не битлинк
-    # link = 'https://bit.ly/3DiSJCw'  # корректный битлинк
-    # link = 'https://bit.ly/3DiSJCX'  # кривой битлинк
 
     if is_bitlink(my_token, link)[0] == '0':
         try:
