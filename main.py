@@ -1,15 +1,7 @@
 import requests
 import json
-from datetime import datetime
 from urllib import parse
 from decouple import config
-
-
-link_status = (
-    ('0', 'good_bitlink'),
-    ('1', 'bad_bitlink'),
-    ('2', 'not_bitlink'),
-)
 
 
 def shorten_link(token, url):
@@ -43,11 +35,10 @@ def count_clicks(token, bitlink):
         'Authorization': f'Bearer {token}'
     }
 
-    params = (
+    params = {
         ('unit', 'month'),
-        ('units', '-1'),
-        ('unit_reference', datetime.now().isoformat().replace('.', '-')[:-2]),
-    )
+        ('units', '-1')
+    }
 
     response = requests.get(
         f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bitlink).path}/clicks/summary',
@@ -74,33 +65,24 @@ def is_bitlink(token, link):
         'Authorization': f'Bearer {token}'
     }
 
-    if parse.urlparse(link).netloc == 'bit.ly':
-        response = requests.get(
-            f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(link).path}',
-            headers=headers
-        )
-        try:
-            response.raise_for_status()
-            return link_status[0]
-        except requests.exceptions.HTTPError:
-            return link_status[1]
-    else:
-        return link_status[2]
+    response = requests.get(
+        f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(link).path}',
+        headers=headers
+    )
+    return response.ok
 
 
 if __name__ == '__main__':
     my_token = config('token', '')
     link = input('Введите ссылку:')
 
-    if is_bitlink(my_token, link)[0] == '0':
+    if is_bitlink(my_token, link):
         try:
             cnt = count_clicks(my_token, link)
             print('Количество кликов', cnt)
         except Exception as e:
             print(f'Ошибка получения количества кликов по битлинку: {e}')
-    elif is_bitlink(my_token, link)[0] == '1':
-        print(f'Кривой битлинк: {link}')
-    elif is_bitlink(my_token, link)[0] == '2':
+    else:
         try:
             bitlink = shorten_link(my_token, link)
             print('Битлинк', bitlink)
