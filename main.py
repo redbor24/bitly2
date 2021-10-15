@@ -4,9 +4,6 @@ from decouple import config
 
 
 def shorten_link(token, url):
-    if not token:
-        raise Exception('Ошибка! Токен не задан!')
-
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
@@ -30,9 +27,6 @@ def shorten_link(token, url):
 
 
 def count_clicks(token, bit_link):
-    if not token:
-        raise Exception('Ошибка! Токен не задан!')
-
     headers = {
         'Authorization': f'Bearer {token}'
     }
@@ -61,9 +55,6 @@ def count_clicks(token, bit_link):
 
 
 def is_bitlink(token, bit_link):
-    if not token:
-        raise Exception('Ошибка! Токен не задан!')
-
     headers = {
         'Authorization': f'Bearer {token}'
     }
