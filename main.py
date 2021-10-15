@@ -1,7 +1,6 @@
 import requests
 from urllib import parse
 from decouple import config
-from urllib3.exceptions import HTTPError
 
 
 def shorten_link(token, url):
@@ -69,23 +68,23 @@ def is_bitlink(token, bit_link):
         f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bit_link).path}',
         headers=headers
     )
-    
+
     return response.ok
 
 
 if __name__ == '__main__':
-    my_token = config('token', '')
+    bitly_token = config('BITLY_TOKEN', '')
     link = input('Введите ссылку:')
 
-    if is_bitlink(my_token, link):
+    if is_bitlink(bitly_token, link):
         try:
-            cnt = count_clicks(my_token, link)
+            cnt = count_clicks(bitly_token, link)
             print('Количество кликов', cnt)
         except requests.exceptions.HTTPError as e:
             print(f'Ошибка получения количества кликов по битлинку: {e}')
     else:
         try:
-            bitlink = shorten_link(my_token, link)
+            bitlink = shorten_link(bitly_token, link)
             print('Битлинк', bitlink)
         except requests.exceptions.HTTPError as e:
             print(f'Ошибка формирования битлинка: {e}')
