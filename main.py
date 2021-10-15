@@ -1,6 +1,7 @@
 import requests
 from urllib import parse
 from decouple import config
+from urllib3.exceptions import HTTPError
 
 
 def shorten_link(token, url):
@@ -10,19 +11,23 @@ def shorten_link(token, url):
     }
 
     if not parse.urlparse(url).scheme:
-        url = f'http://{url}'
+        _url = f'http://{url}'
+    else:
+        _url = url
 
     response = requests.post(
         'https://api-ssl.bitly.com/v4/shorten',
         headers=headers,
-        json={"long_url": url, "domain": "bit.ly"}
+        json={"long_url": _url, "domain": "bit.ly"}
     )
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.json()['message'] == 'INVALID_ARG_LONG_URL':
-            raise Exception(f'некорректный URL - {url}')
+            raise requests.exceptions.HTTPError(f'Некорректный URL - {url}')
+        else:
+            raise requests.exceptions.HTTPError(f'Ошибка - {response.json()["message"]}')
     return response.json()['link']
 
 
@@ -41,16 +46,17 @@ def count_clicks(token, bit_link):
         headers=headers,
         params=params
     )
+
     try:
         response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except requests.exceptions.HTTPError:
         if response.json()['message'] == 'NOT_FOUND':
-            raise Exception(f'некорректный URL - {response.url}')
+            raise requests.exceptions.HTTPError(f'некорректный URL - {response.url}')
         elif response.json()['description'] == 'The value provided is invalid.':
             bad_param = response.json()["errors"][0]["field"]
-            raise Exception(f'некорректное значение параметра {bad_param} - {params}')
+            raise requests.exceptions.HTTPError(f'некорректное значение параметра {bad_param} - {params}')
         else:
-            raise err
+            raise requests.exceptions.HTTPError(response.json()['message'])
     return response.json()['total_clicks']
 
 
@@ -63,6 +69,7 @@ def is_bitlink(token, bit_link):
         f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bit_link).path}',
         headers=headers
     )
+    
     return response.ok
 
 
@@ -74,11 +81,11 @@ if __name__ == '__main__':
         try:
             cnt = count_clicks(my_token, link)
             print('Количество кликов', cnt)
-        except Exception as e:
+        except requests.exceptions.HTTPError as e:
             print(f'Ошибка получения количества кликов по битлинку: {e}')
     else:
         try:
             bitlink = shorten_link(my_token, link)
             print('Битлинк', bitlink)
-        except Exception as e:
+        except requests.exceptions.HTTPError as e:
             print(f'Ошибка формирования битлинка: {e}')
