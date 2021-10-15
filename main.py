@@ -19,15 +19,15 @@ def shorten_link(token, long_url):
         headers=headers,
         json={"long_url": _long_url, "domain": "bit.ly"}
     )
-
+    response_json = response.json()
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.json()['message'] == 'INVALID_ARG_LONG_URL':
+        if response_json['message'] == 'INVALID_ARG_LONG_URL':
             raise requests.exceptions.HTTPError(f'Некорректный URL - {long_url}')
         else:
-            raise requests.exceptions.HTTPError(f'Ошибка - {response.json()["message"]}')
-    return response.json()['link']
+            raise requests.exceptions.HTTPError(f'Ошибка - {response_json["message"]}')
+    return response_json['link']
 
 
 def count_clicks(token, bit_link):
@@ -45,18 +45,19 @@ def count_clicks(token, bit_link):
         headers=headers,
         params=params
     )
+    response_json = response.json()
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.json()['message'] == 'NOT_FOUND':
+        if response_json['message'] == 'NOT_FOUND':
             raise requests.exceptions.HTTPError(f'некорректный URL - {response.url}')
-        elif response.json()['description'] == 'The value provided is invalid.':
-            bad_param = response.json()["errors"][0]["field"]
+        elif response_json['description'] == 'The value provided is invalid.':
+            bad_param = response_json["errors"][0]["field"]
             raise requests.exceptions.HTTPError(f'некорректное значение параметра {bad_param} - {params}')
         else:
             raise requests.exceptions.HTTPError(response.json()['message'])
-    return response.json()['total_clicks']
+    return response_json['total_clicks']
 
 
 def is_bitlink(token, bit_link):
