@@ -1,5 +1,4 @@
 import requests
-import json
 from urllib import parse
 from decouple import config
 
@@ -14,11 +13,14 @@ def shorten_link(token, url):
     }
 
     if not parse.urlparse(url).scheme:
-        fu = parse.urlparse(link)._replace(scheme='http://')
-        url = f'{fu.scheme}{fu.netloc}{fu.path}{fu.params}{fu.query}{fu.fragment}'
+        url = f'http://{url}'
 
-    json_str = json.dumps({"long_url": url, "domain": "bit.ly"})
-    response = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=headers, data=json_str)
+    response = requests.post(
+        'https://api-ssl.bitly.com/v4/shorten',
+        headers=headers,
+        json={"long_url": url, "domain": "bit.ly"}
+    )
+
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
@@ -27,7 +29,7 @@ def shorten_link(token, url):
     return response.json()['link']
 
 
-def count_clicks(token, bitlink):
+def count_clicks(token, bit_link):
     if not token:
         raise Exception('Ошибка! Токен не задан!')
 
@@ -41,8 +43,9 @@ def count_clicks(token, bitlink):
     }
 
     response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bitlink).path}/clicks/summary',
-        headers=headers, params=params
+        f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bit_link).path}/clicks/summary',
+        headers=headers,
+        params=params
     )
     try:
         response.raise_for_status()
@@ -57,7 +60,7 @@ def count_clicks(token, bitlink):
     return response.json()['total_clicks']
 
 
-def is_bitlink(token, link):
+def is_bitlink(token, bit_link):
     if not token:
         raise Exception('Ошибка! Токен не задан!')
 
@@ -66,7 +69,7 @@ def is_bitlink(token, link):
     }
 
     response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(link).path}',
+        f'https://api-ssl.bitly.com/v4/bitlinks/bit.ly/{parse.urlparse(bit_link).path}',
         headers=headers
     )
     return response.ok
