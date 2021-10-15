@@ -3,28 +3,28 @@ from urllib import parse
 from decouple import config
 
 
-def shorten_link(token, url):
+def shorten_link(token, long_url):
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
     }
 
-    if not parse.urlparse(url).scheme:
-        _url = f'http://{url}'
+    if not parse.urlparse(long_url).scheme:
+        _long_url = f'http://{long_url}'
     else:
-        _url = url
+        _long_url = long_url
 
     response = requests.post(
         'https://api-ssl.bitly.com/v4/shorten',
         headers=headers,
-        json={"long_url": _url, "domain": "bit.ly"}
+        json={"long_url": _long_url, "domain": "bit.ly"}
     )
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.json()['message'] == 'INVALID_ARG_LONG_URL':
-            raise requests.exceptions.HTTPError(f'Некорректный URL - {url}')
+            raise requests.exceptions.HTTPError(f'Некорректный URL - {long_url}')
         else:
             raise requests.exceptions.HTTPError(f'Ошибка - {response.json()["message"]}')
     return response.json()['link']
@@ -74,17 +74,17 @@ def is_bitlink(token, bit_link):
 
 if __name__ == '__main__':
     bitly_token = config('BITLY_TOKEN', '')
-    link = input('Введите ссылку:')
+    url = input('Введите ссылку:')
 
-    if is_bitlink(bitly_token, link):
+    if is_bitlink(bitly_token, url):
         try:
-            cnt = count_clicks(bitly_token, link)
-            print('Количество кликов', cnt)
+            bitlink_click_count = count_clicks(bitly_token, url)
+            print('Количество кликов', bitlink_click_count)
         except requests.exceptions.HTTPError as e:
             print(f'Ошибка получения количества кликов по битлинку: {e}')
     else:
         try:
-            bitlink = shorten_link(bitly_token, link)
+            bitlink = shorten_link(bitly_token, url)
             print('Битлинк', bitlink)
         except requests.exceptions.HTTPError as e:
             print(f'Ошибка формирования битлинка: {e}')
