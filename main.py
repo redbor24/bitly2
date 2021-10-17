@@ -45,15 +45,15 @@ def count_clicks(token, bit_link):
         headers=headers,
         params=params
     )
-    response_json = response.json()
+    response_data = response.json()
 
     try:
         response.raise_for_status()
     except requests.RequestException:
-        if response_json['message'] == 'NOT_FOUND':
+        if response_data['message'] == 'NOT_FOUND':
             raise requests.RequestException(f'некорректный URL - {response.url}')
-        elif response_json['description'] == 'The value provided is invalid.':
-            bad_param = response_json["errors"][0]["field"]
+        elif response_data['description'] == 'The value provided is invalid.':
+            bad_param = response_data["errors"][0]["field"]
             raise requests.RequestException(f'некорректное значение параметра {bad_param} - {params}')
         else:
             raise requests.RequestException(response.json()['message'])
