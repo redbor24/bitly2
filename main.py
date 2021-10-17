@@ -22,11 +22,11 @@ def shorten_link(token, long_url):
     response_json = response.json()
     try:
         response.raise_for_status()
-    except requests.exceptions.HTTPError:
+    except requests.RequestException:
         if response_json['message'] == 'INVALID_ARG_LONG_URL':
-            raise requests.exceptions.HTTPError(f'Некорректный URL - {long_url}')
+            raise requests.RequestException(f'Некорректный URL - {long_url}')
         else:
-            raise requests.exceptions.HTTPError(f'Ошибка - {response_json["message"]}')
+            raise requests.RequestException(f'Ошибка - {response_json["message"]}')
     return response_json['link']
 
 
@@ -36,8 +36,8 @@ def count_clicks(token, bit_link):
     }
 
     params = {
-        ('unit', 'month'),
-        ('units', '-1')
+        'unit': 'month',
+        'units': '-1'
     }
 
     response = requests.get(
@@ -49,14 +49,14 @@ def count_clicks(token, bit_link):
 
     try:
         response.raise_for_status()
-    except requests.exceptions.HTTPError:
+    except requests.RequestException:
         if response_json['message'] == 'NOT_FOUND':
-            raise requests.exceptions.HTTPError(f'некорректный URL - {response.url}')
+            raise requests.RequestException(f'некорректный URL - {response.url}')
         elif response_json['description'] == 'The value provided is invalid.':
             bad_param = response_json["errors"][0]["field"]
-            raise requests.exceptions.HTTPError(f'некорректное значение параметра {bad_param} - {params}')
+            raise requests.RequestException(f'некорректное значение параметра {bad_param} - {params}')
         else:
-            raise requests.exceptions.HTTPError(response.json()['message'])
+            raise requests.RequestException(response.json()['message'])
     return response_json['total_clicks']
 
 
@@ -81,11 +81,11 @@ if __name__ == '__main__':
         try:
             bitlink_click_count = count_clicks(bitly_token, url)
             print('Количество кликов', bitlink_click_count)
-        except requests.exceptions.HTTPError as e:
+        except requests.RequestException as e:
             print(f'Ошибка получения количества кликов по битлинку: {e}')
     else:
         try:
             bitlink = shorten_link(bitly_token, url)
             print('Битлинк', bitlink)
-        except requests.exceptions.HTTPError as e:
+        except requests.RequestException as e:
             print(f'Ошибка формирования битлинка: {e}')
