@@ -19,15 +19,9 @@ def shorten_link(token, long_url):
         headers=headers,
         json={"long_url": _long_url, "domain": "bit.ly"}
     )
-    response_json = response.json()
-    try:
-        response.raise_for_status()
-    except requests.RequestException:
-        if response_json['message'] == 'INVALID_ARG_LONG_URL':
-            raise requests.RequestException(f'Некорректный URL - {long_url}')
-        else:
-            raise requests.RequestException(f'Ошибка - {response_json["message"]}')
-    return response_json['link']
+
+    response.raise_for_status()
+    return response.json()['link']
 
 
 def count_clicks(token, bit_link):
@@ -45,19 +39,9 @@ def count_clicks(token, bit_link):
         headers=headers,
         params=params
     )
-    response_data = response.json()
 
-    try:
-        response.raise_for_status()
-    except requests.RequestException:
-        if response_data['message'] == 'NOT_FOUND':
-            raise requests.RequestException(f'некорректный URL - {response.url}')
-        elif response_data['description'] == 'The value provided is invalid.':
-            bad_param = response_data["errors"][0]["field"]
-            raise requests.RequestException(f'некорректное значение параметра {bad_param} - {params}')
-        else:
-            raise requests.RequestException(response.json()['message'])
-    return response_data['total_clicks']
+    response.raise_for_status()
+    return response.json()['total_clicks']
 
 
 def is_bitlink(token, bit_link):
@@ -81,11 +65,11 @@ if __name__ == '__main__':
         try:
             bitlink_click_count = count_clicks(bitly_token, url)
             print('Количество кликов', bitlink_click_count)
-        except requests.RequestException as e:
-            print(f'Ошибка получения количества кликов по битлинку: {e}')
+        except requests.exceptions.HTTPError as e:
+            print(f'Ошибка получения количества кликов по битлинку: {url}')
     else:
         try:
             bitlink = shorten_link(bitly_token, url)
             print('Битлинк', bitlink)
         except requests.RequestException as e:
-            print(f'Ошибка формирования битлинка: {e}')
+            print(f'Ошибка формирования битлинка для {url}: {e}. Message: {e.response.json()["message"]}')
