@@ -57,7 +57,7 @@ def count_clicks(token, bit_link):
             raise requests.RequestException(f'некорректное значение параметра {bad_param} - {params}')
         else:
             raise requests.RequestException(response.json()['message'])
-    return response_json['total_clicks']
+    return response_data['total_clicks']
 
 
 def is_bitlink(token, bit_link):
