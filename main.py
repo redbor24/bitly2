@@ -66,7 +66,7 @@ if __name__ == '__main__':
         try:
             bitlink_click_count = count_clicks(bitly_token, url)
             print('Количество кликов', bitlink_click_count)
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
             print(f'Ошибка получения количества кликов по битлинку: {url}')
     else:
         try:
