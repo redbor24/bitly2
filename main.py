@@ -34,11 +34,12 @@ def count_clicks(token, bit_link):
         'units': '-1'
     }
 
-    response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/{parse.urlparse(bit_link).netloc}{parse.urlparse(bit_link).path}/clicks/summary',
-        headers=headers,
-        params=params
-    )
+    parsed_bitlink = parse.urlparse(bit_link)
+    response = requests.get(f'https://api-ssl.bitly.com/v4/bitlinks/'
+                            f'{parsed_bitlink.netloc}{parsed_bitlink.path}'
+                            f'/clicks/summary',
+                            headers=headers,
+                            params=params)
 
     response.raise_for_status()
     return response.json()['total_clicks']
@@ -49,10 +50,10 @@ def is_bitlink(token, bit_link):
         'Authorization': f'Bearer {token}'
     }
 
-    response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/{parse.urlparse(bit_link).netloc}{parse.urlparse(bit_link).path}',
-        headers=headers
-    )
+    parsed_bitlink = parse.urlparse(bit_link)
+    response = requests.get(f'https://api-ssl.bitly.com/v4/bitlinks/'
+                            f'{parsed_bitlink.netloc}{parsed_bitlink.path}',
+                            headers=headers)
 
     return response.ok
 
@@ -72,4 +73,5 @@ if __name__ == '__main__':
             bitlink = shorten_link(bitly_token, url)
             print('Битлинк', bitlink)
         except requests.RequestException as e:
-            print(f'Ошибка формирования битлинка для {url}: {e}. Message: {e.response.json()["message"]}')
+            print(f'Ошибка формирования битлинка для {url}: {e}. Message: '
+                  f'{e.response.json()["message"]}')
