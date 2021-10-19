@@ -41,7 +41,6 @@ def count_clicks(token, bit_link):
     )
 
     response.raise_for_status()
-    print(response.request.url)
     return response.json()['total_clicks']
 
 
