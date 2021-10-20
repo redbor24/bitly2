@@ -1,6 +1,7 @@
 import requests
 from urllib import parse
 from decouple import config
+import argparse
 
 
 def shorten_link(token, long_url):
@@ -60,7 +61,21 @@ def is_bitlink(token, bit_link):
 
 if __name__ == '__main__':
     bitly_token = config('BITLY_TOKEN', '')
-    url = input('Введите ссылку:')
+
+    parser = argparse.ArgumentParser(
+        description='Формирование битлинка из обычной ссылки или получение '
+                    'количества кликов по битлинку',
+        add_help=False
+    )
+    parser_main_group = parser.add_argument_group(title='Параметры')
+    parser_main_group.add_argument('url', nargs='?', help='URL или битлинк')
+
+    args = parser.parse_args()
+    if args.url:
+        url = args.url
+    else:
+        parser.print_help()
+        exit()
 
     if is_bitlink(bitly_token, url):
         try:
