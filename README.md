@@ -6,16 +6,16 @@ The script returns the number of clicks on a Bitlink or Bitlink for a regular li
     python-decouple==3.5
 
 ## Usage
-    $ python main.py [url]
+    python main.py [url]
 
 ## Usage examples
-    $ python main.py https://dvmn.org/encyclopedia/tutorial/tutorial_readme/
+    python main.py https://dvmn.org/encyclopedia/tutorial/tutorial_readme/
     Битлинк: https://bit.ly/3vxdSGu
 
-    $ python main.py https://bit.ly/3vxdSGu
+    python main.py https://bit.ly/3vxdSGu
     Количество кликов: 0
 
-    $ python main.py
+    python main.py
     usage: main.py [url]
     
     The script returns the number of clicks on a Bitlink or Bitlink for a regular link
