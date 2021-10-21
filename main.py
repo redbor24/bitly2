@@ -63,12 +63,12 @@ if __name__ == '__main__':
     bitly_token = config('BITLY_TOKEN', '')
 
     parser = argparse.ArgumentParser(
-        description='Формирование битлинка из обычной ссылки или получение '
-                    'количества кликов по битлинку',
+        description='The script returns the number of clicks on a Bitlink or '
+                    'Bitlink for a regular link',
         add_help=False
     )
-    parser_main_group = parser.add_argument_group(title='Параметры')
-    parser_main_group.add_argument('url', nargs='?', help='URL или битлинк')
+    # parser_main_group = parser.add_argument_group(title='Параметры')
+    parser.add_argument('url', nargs='?', help='URL or Bitlink')
 
     args = parser.parse_args()
     if args.url:
@@ -80,13 +80,13 @@ if __name__ == '__main__':
     if is_bitlink(bitly_token, url):
         try:
             bitlink_click_count = count_clicks(bitly_token, url)
-            print('Количество кликов', bitlink_click_count)
+            print(f'Количество кликов: {bitlink_click_count}')
         except requests.exceptions.HTTPError:
             print(f'Ошибка получения количества кликов по битлинку: {url}')
     else:
         try:
             bitlink = shorten_link(bitly_token, url)
-            print('Битлинк', bitlink)
+            print(f'Битлинк: {bitlink}')
         except requests.RequestException as e:
             print(f'Ошибка формирования битлинка для {url}: {e}. Message: '
                   f'{e.response.json()["message"]}')
