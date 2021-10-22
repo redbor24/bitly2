@@ -1,7 +1,8 @@
-import requests
-from urllib import parse
-from decouple import config
 import argparse
+from urllib import parse
+
+import requests
+from decouple import config
 
 
 def shorten_link(token, long_url):
