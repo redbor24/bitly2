@@ -1,4 +1,5 @@
 import argparse
+import sys
 from urllib import parse
 
 import requests
@@ -68,15 +69,14 @@ if __name__ == '__main__':
                     'Bitlink for a regular link',
         add_help=False
     )
-    parser.add_argument('url', help='URL or Bitlink')
+    parser.add_argument('url', nargs='?', help='URL or Bitlink')
 
     args = parser.parse_args()
-    if args.url:
-        url = args.url
-    else:
+    if not args.url:
         parser.print_help()
-        exit()
+        sys.exit()
 
+    url = args.url
     if is_bitlink(bitly_token, url):
         try:
             bitlink_click_count = count_clicks(bitly_token, url)
