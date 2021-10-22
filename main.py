@@ -68,8 +68,7 @@ if __name__ == '__main__':
                     'Bitlink for a regular link',
         add_help=False
     )
-    # parser_main_group = parser.add_argument_group(title='Параметры')
-    parser.add_argument('url', nargs='?', help='URL or Bitlink')
+    parser.add_argument('url', help='URL or Bitlink')
 
     args = parser.parse_args()
     if args.url:
