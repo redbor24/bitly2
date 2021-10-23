@@ -1,5 +1,5 @@
 ## Description
-The script returns the number of clicks on a Bitlink or Bitlink for a regular link
+The script returns the number of clicks on a Bitlink or Bitlink for a regular link.
 
 ## Requirements
     requests==2.26.0
@@ -9,7 +9,7 @@ The script returns the number of clicks on a Bitlink or Bitlink for a regular li
     pip install -r requirements.txt
 
 ## Environment
-The .env file must contain the token for the bitly.com API
+The .env file must contain the token for the bitly.com API.
 
     BITLY_TOKEN = '<bitly.com_API_token>'
 
@@ -28,7 +28,7 @@ See [How to generate Bitly-token](https://app.bitly.com/settings/api/)
     python main.py
     usage: main.py [url]
     
-    The script returns the number of clicks on a Bitlink or Bitlink for a regular link
+    The script returns the number of clicks on a Bitlink or Bitlink for a regular link.
 
     positional arguments:
       url  URL or Bitlink
