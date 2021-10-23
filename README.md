@@ -9,7 +9,7 @@ The script returns the number of clicks on a Bitlink or Bitlink for a regular li
     pip install -r requirements.txt
 
 ## Environment
-The .env file must contain the token for the bitly.com API.
+The .env file must contain the token for the [bitly.com](https://app.bitly.com/) API.
 
     BITLY_TOKEN = '<bitly.com_API_token>'
 
